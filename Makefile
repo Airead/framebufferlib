@@ -1,12 +1,12 @@
 CC	= gcc
-CFLAGS	= -Wall -g
-OBJECT = line.c pixel.c framebuffer.c
+CFLAGS	= -Wall -g -DDEBUG -lm
+OBJECT = test.c line.c pixel.c framebuffer.c plane.c circle.c
 LDFLAGS	= 
 
-test: $(OBJECT)
+test.out: $(OBJECT)
 	$(CC) $(CFLAGS) -o $@ $(OBJECT)
 
 .PHONY: all clean
 
 clean:
-	rm -f *.o *~ a.out $(TARGETS)
+	rm -f *.o *~ a.out test.out

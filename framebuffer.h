@@ -11,13 +11,13 @@
 
 #include <linux/fb.h>
 
-struct framebuffer{
+typedef struct framebuffer{
 	int fb_fd;		/* file descriptor */
 	struct fb_fix_screeninfo fb_finfo;
 	struct fb_var_screeninfo fb_vinfo;
 	unsigned long fb_screensize; /* bytes */
 	unsigned char *fb_starting;	/* pointer mmap framebuffer starting */
-};
+}FB;
 
 unsigned char *fb_open(char *fbname, struct framebuffer *fbp);
 int fb_close(struct framebuffer *fbp);

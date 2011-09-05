@@ -13,6 +13,14 @@
 
 typedef unsigned long COLOR_32;	/* 0x0f0f0f0f: transp, red, green, blue*/
 
-int fb_draw_pixel(struct framebuffer *fbp, int x, int y, COLOR_32 color);
+typedef struct point{
+	int x;
+	int y;
+	COLOR_32 color;
+}FB_POINT;
+
+int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color);
+int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point);
+unsigned long formatRGB(unsigned char red, unsigned char green, unsigned char blue);
 
 #endif
