@@ -6,8 +6,8 @@
  *		after studying APUE 13 days		*
  ********************************************************/
 
-#ifndef FB_FRAMEBUFFER
-#define FB_FRAMEBUFFER
+#ifndef FB_FRAMEBUFFER_H
+#define FB_FRAMEBUFFER_H
 
 #include <linux/fb.h>
 
@@ -16,10 +16,10 @@ typedef struct framebuffer{
 	struct fb_fix_screeninfo fb_finfo;
 	struct fb_var_screeninfo fb_vinfo;
 	unsigned long fb_screensize; /* bytes */
-	unsigned char *fb_starting;	/* pointer mmap framebuffer starting */
+	unsigned char *fb_start;	/* pointer mmap framebuffer starting */
 }FB;
 
-unsigned char *fb_open(char *fbname, struct framebuffer *fbp);
-int fb_close(struct framebuffer *fbp);
+int fb_open(char *fbname, FB *fbp);
+int fb_close(FB *fbp);
 
 #endif

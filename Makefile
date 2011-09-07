@@ -1,6 +1,10 @@
 CC	= gcc
-CFLAGS	= -Wall -g -DDEBUG -lm
-OBJECT = test.c line.c pixel.c framebuffer.c plane.c circle.c
+
+CFLAGS	= -Wall -g -DDEBUG -lm -ljpeg
+
+OBJECT = testscreen.c line.c pixel.c framebuffer.c plane.c circle.c \
+	jpeg.c image.c screen.c 
+
 LDFLAGS	= 
 
 test.out: $(OBJECT)

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 		
 //		fb_draw_rect(&fb, &rect);
 		//int fb_rect_tranform(FB *fbp, FB_RECT *fb_rectp, int flag, float hs, float vs, FB_POINT *fixpoint)
-		fb_rect_tranform(&fb, &rect, FB_ROTATION_FIXPOINT, 2, 2, &point2);
+		fb_rect_tranform(&fb, &rect, FB_ROTATION_FIXPOINT, 5, 5, &point2);
 #endif
 
 #if PLANE_ROTATION

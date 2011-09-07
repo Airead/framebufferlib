@@ -40,7 +40,7 @@ int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point)
 	locate = (point->y * fbp->fb_vinfo.xres + point->x) 
 		* fbp->fb_vinfo.bits_per_pixel / 8;
 	
-	p = fbp->fb_starting + locate;
+	p = fbp->fb_start + locate;
 
 	*p++ = (point->color >> 0) & 0xff; /* blue */
 	*p++ = (point->color >> 8) & 0xff; /* green */
@@ -50,7 +50,7 @@ int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point)
 	return 0;
 }
 
-unsigned long formatRGB(unsigned char red, unsigned char green, unsigned char blue)
+unsigned long fb_formatRGB(unsigned char red, unsigned char green, unsigned char blue)
 {
 	unsigned long color = 0;
 

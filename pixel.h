@@ -6,8 +6,8 @@
  *		after studying APUE 13 days		*
  ********************************************************/
 
-#ifndef FB_PIXEL
-#define FB_PIXEL
+#ifndef FB_PIXEL_H
+#define FB_PIXEL_H
 
 #include "framebuffer.h"
 
@@ -21,6 +21,6 @@ typedef struct point{
 
 int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color);
 int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point);
-unsigned long formatRGB(unsigned char red, unsigned char green, unsigned char blue);
+unsigned long fb_formatRGB(unsigned char red, unsigned char green, unsigned char blue);
 
 #endif
