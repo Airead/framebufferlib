@@ -12,11 +12,12 @@
 #include <string.h>
 #include <errno.h>
 #include "pixel.h"
+#include "line.h"
 #include "plane.h"
 #include "framebuffer.h"
 
 
-int fb_set_rect(FB_RECT *fb_rectp, FB_POINT *point, int width, int height)
+int fb_rect_set(FB_RECT *fb_rectp, FB_POINT *point, int width, int height)
 {
 	fb_rectp->left_top.x = point->x;
 	fb_rectp->left_top.y = point->y;
@@ -30,7 +31,7 @@ int fb_set_rect(FB_RECT *fb_rectp, FB_POINT *point, int width, int height)
 /* 
  * set background with color
  */
-int fb_draw_background(FB *fbp, COLOR_32 color)
+int fb_rect_draw_background(FB *fbp, COLOR_32 color)
 {
 	int x, y;
 	FB_POINT point;
@@ -52,9 +53,57 @@ int fb_draw_background(FB *fbp, COLOR_32 color)
  * draw a rect from left_top to right_bottom
  * color according left_top
  */
-int fb_draw_rect(FB *fbp, FB_RECT *fb_rectp) 
+int fb_rect_draw(FB *fbp, FB_RECT *fb_rectp) 
 {
 	fb_rect_rotation(fbp, fb_rectp, 0, FB_ROTATION_ORIGIN, NULL);
+
+	return 0;
+}
+
+/*
+ * draw a rect from left_top to right_bottom
+ * color according left_top
+ */
+int fb_rect_draw_nofill(FB *fbp, FB_RECT *rectp) 
+{
+	FB_POINT point1, point2;
+
+	/* top */
+	//int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color)
+	fb_set_pixel(&point1, rectp->left_top.x, rectp->left_top.y, 
+		     rectp->left_top.color);
+	fb_set_pixel(&point2, rectp->left_top.x + rectp->width - 1, 
+		     rectp->left_top.y, rectp->left_top.color);
+	//int fb_draw_line(FB *fbp, FB_POINT *point1, FB_POINT *point2)
+	fb_draw_line(fbp, &point1, &point2);
+
+	/* left */
+	//int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color)
+	fb_set_pixel(&point1, rectp->left_top.x, rectp->left_top.y, 
+		     rectp->left_top.color);
+	fb_set_pixel(&point2, rectp->left_top.x, rectp->left_top.y + rectp->height, 
+		     rectp->left_top.color);
+	//int fb_draw_line(FB *fbp, FB_POINT *point1, FB_POINT *point2)
+	fb_draw_line(fbp, &point1, &point2);
+
+	/* bottom */
+	//int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color)
+	fb_set_pixel(&point1, rectp->left_top.x, rectp->left_top.y + rectp->height - 1, 
+		     rectp->left_top.color);
+	fb_set_pixel(&point2, rectp->left_top.x + rectp->width - 1, 
+		     rectp->left_top.y + rectp->height - 1, rectp->left_top.color);
+	//int fb_draw_line(FB *fbp, FB_POINT *point1, FB_POINT *point2)
+	fb_draw_line(fbp, &point1, &point2);
+
+	/* right */
+	//int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color)
+	fb_set_pixel(&point1, rectp->left_top.x + rectp->width - 1, rectp->left_top.y, 
+		     rectp->left_top.color);
+	fb_set_pixel(&point2, rectp->left_top.x + rectp->width - 1, 
+		     rectp->left_top.y + rectp->height - 1, rectp->left_top.color);
+	//int fb_draw_line(FB *fbp, FB_POINT *point1, FB_POINT *point2)
+	fb_draw_line(fbp, &point1, &point2);
+	
 
 	return 0;
 }
@@ -136,3 +185,5 @@ int fb_rect_tranform(FB *fbp, FB_RECT *fb_rectp, int flag, float hs, float vs, F
 
 	return 0;
 }
+
+

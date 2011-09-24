@@ -1,9 +1,9 @@
 CC	= gcc
 
-CFLAGS	= -Wall -g -DDEBUG -lm -ljpeg
+CFLAGS	= -Wall -g -DDEBUG -lm -ljpeg -lz -lfreetype
 
-OBJECT = testscreen.c line.c pixel.c framebuffer.c plane.c circle.c \
-	jpeg.c image.c screen.c 
+OBJECT = testtext.c line.c pixel.c framebuffer.c plane.c circle.c \
+	jpeg.c image.c screen.c font.c text.c
 
 LDFLAGS	= 
 

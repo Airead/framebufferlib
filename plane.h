@@ -19,10 +19,11 @@ typedef struct fb_rect{
 	int height;
 }FB_RECT;
 
-int fb_draw_background(FB *fbp, COLOR_32 color);
-int fb_draw_rect(FB *fbp, FB_RECT *fb_rect);
-int fb_set_rect(FB_RECT *fb_rectp, FB_POINT *point, int width, int height);
+int fb_rect_draw_background(FB *fbp, COLOR_32 color);
+int fb_rect_draw(FB *fbp, FB_RECT *fb_rect);
+int fb_rect_set(FB_RECT *fb_rectp, FB_POINT *point, int width, int height);
 int fb_rect_rotation(FB *fbp, FB_RECT *fb_rectp, double radian, int flag, FB_POINT *fixpoint);
 int fb_rect_tranform(FB *fbp, FB_RECT *fb_rectp, int flag, float hs, float vs, FB_POINT *fixpoint);
+int fb_rect_draw_nofill(FB *fbp, FB_RECT *rectp);
 
 #endif

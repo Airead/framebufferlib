@@ -65,7 +65,7 @@ int fb_draw_line(FB *fbp, FB_POINT *point1, FB_POINT *point2)
 	e = 2 * dy - dx;
 
 	/* main loop */
-	for(i = 0; i < dx; i++){
+	for(i = 0; i <= dx; i++){
 		fb_set_pixel(&point, x, y, point1->color);
 		fb_draw_pixel(fbp, &point);
 		while(e > 0){

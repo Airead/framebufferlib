@@ -15,7 +15,7 @@
 #include "jpeg.h"
 
 #define MOVE 0
-#define LARGE 0
+#define LARGE 1
 #define ROTA 0
 
 int main(int argc, char *argv[])
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
 	//int fb_load_jpeg(FB_IMAGE *imagep, char *filename);
 	fb_load_jpeg(&image, "logo.jpg");
-	fb_load_jpeg(&background, "taiji.jpg");
+	fb_load_jpeg(&background, "taiji_logo.jpg");
 
 	fprintf(stdout, "Before opt, image size: %lu\n", image.imagesize);
 	fb_imageinfo(&image);
@@ -144,14 +144,14 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef ROTA
-	FB_IMAGE retimg;
+//	FB_IMAGE retimg;
 	float radian;
 
 	fb_image_setpos(&image, 200, 200);
-	fb_image_setpos(&background, -120, -110);
+	fb_image_setpos(&background, 145, 45);
 	
 radian = 0;
-	while(radian < 1000){
+	while(radian > -1){
 
 //		fb_screen_clear(&screen);
 
@@ -160,13 +160,13 @@ radian = 0;
 		fb_image_rotate2(&background, &retimg, radian);
 
 		fb_screen_add_image(&screen, &retimg);
+
+		usleep(40000);
 		fb_screen_update(&screen);
 	
 		fb_image_destory(&retimg);
 
-		radian += 0.01;
-		
-		usleep(20000);
+		radian += 0.005;
 	}
 	
 #endif
