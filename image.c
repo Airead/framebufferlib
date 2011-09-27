@@ -349,12 +349,108 @@ int fb_image_enlarge(FB_IMAGE *imagep, FB_IMAGE *retimgp, float proportionx, flo
 }
 
 /*
+ * full a image to a ensure image
+ */
+int fb_image_full_image(FB_IMAGE *imagep, FB_IMAGE *retimgp, int lock)
+{
+	int i, j, k;
+	int nx, ny;
+	int ox, oy;
+	unsigned long tm_loc, loc, offset;
+	float px, py;
+
+	px = imagep->width / (float)retimgp->width;
+	py = imagep->height / (float)retimgp->height;
+
+	if(lock == IMAGE_FULL_LOCK){
+		if(px > py){
+			py = px;
+		}else{
+			px = py;
+		}
+	}
+
+	ox = (retimgp->width - imagep->width / px) / 2;
+	oy = (retimgp->height - imagep->height / py) / 2;
+
+	offset = (oy * retimgp->width + ox) * retimgp->components;
+
+	memset(retimgp->imagestart, 0, retimgp->imagesize);
+
+	for(i = 0; i < retimgp->height; i++){
+		for(j = 0; j < retimgp->width; j++){
+			nx = j * px;
+			ny = i * py;
+			tm_loc = (i * retimgp->width + j) * retimgp->components + offset;
+			if(nx < imagep->width && ny < imagep->height){
+				loc = (ny * imagep->width + nx) * retimgp->components;
+				for(k = 0; k < 4; k++){
+					retimgp->imagestart[tm_loc + k] = imagep->imagestart[loc + k];
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * add a image to a ensure image, according to imagep x and y
+ */
+int fb_image_add_image(FB_IMAGE *imagep, FB_IMAGE *retimgp)
+{
+	int j;
+	unsigned long ret_loc;	/* retimg location */
+	unsigned long im_loc;	/* image location */
+	long cpbytes;
+	unsigned char *p, *q;
+
+	p = retimgp->imagestart;
+	q = imagep->imagestart;
+
+	
+	for(j = 0; j < imagep->height; j++){
+		/* vertical overflow check */
+		if(0 < imagep->y + j && imagep->y + j < retimgp->height){
+			ret_loc = ((imagep->y + j) * retimgp->width + imagep->x) * retimgp->components;
+			im_loc = j * imagep->width * imagep->components;
+#if TEST		
+			if(j > 200){
+				fprintf(stdout, "imagesize = %lu, screensize = %lu\n", 
+					imagep->imagesize, retimgp->screensize);
+				fprintf(stdout, "j = %d, ret_loc = %lu, im_loc = %lu\n\n", j, ret_loc, im_loc);
+				usleep(50000);
+			}
+#endif
+			/* horizontal overflow check */
+			if(imagep->x >= 0){
+				if(retimgp->width - imagep->x < imagep->width){
+					cpbytes = retimgp->width - imagep->x;
+				}else{
+					cpbytes = imagep->width;
+				}
+			}else{
+				ret_loc = ret_loc - imagep->x * 4; /* -x > 0 */
+				im_loc = im_loc - imagep->x * 4;
+				cpbytes = imagep->width + imagep->x;
+			}
+			//void *memcpy(void *dest, const void *src, size_t n);
+			if(cpbytes > 0){
+				memcpy(p + ret_loc, q + im_loc, cpbytes * 4); 
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
  * set retimgp center
  */
-int fb_image_entlage_setcenter(FB_IMAGE *imagep, FB_IMAGE *retimgp)
+int fb_image_enlarge_setcenter(FB_IMAGE *imagep, FB_IMAGE *retimgp)
 {
-	retimgp->x = imagep->x - (imagep->width / 2) * retimgp->proportionx;
-	retimgp->y = imagep->y - (imagep->height / 2) * retimgp->proportiony;
+	retimgp->x = imagep->x - imagep->width / 2 * (retimgp->proportionx - 1);
+	retimgp->y = imagep->y - imagep->height / 2 * (retimgp->proportiony - 1);
 
 	return 0;
 }
@@ -368,5 +464,129 @@ int fb_image_setpos(FB_IMAGE *imagep, int x, int y)
 	imagep->y = y;
 
 	return 0;
+}
+
+
+/*
+ * Get image's mini mirror
+ */
+int fb_image_getmini(FB_IMAGE *imagep, FB_IMAGE *minimgp, 
+		     int img_width, int img_height)
+{
+	int i, j, k;
+	int x, y, offx, offy;
+	float px, py;
+	unsigned long mini_loc, img_loc, offset;
+
+	if(imagep->width > img_width && imagep->height > img_height){
+		px = img_width / (float)imagep->width;
+		py = img_height / (float)imagep->height;
+	}else{
+		px = 1;
+		py = 1;
+	}
+
+	if(px > py){
+		offx = (img_width - imagep->width * py) / 2;
+		offy = 0;
+
+		px = py;
+	}else{
+		offx = 0;
+		offy = (img_height - imagep->height * px) / 2;
+		
+		py = px;
+	}
+
+	minimgp->components = imagep->components;
+	minimgp->width = img_width;
+	minimgp->height = img_height;
+	minimgp->imagesize = minimgp->width * minimgp->height * minimgp->components;
+	minimgp->proportionx = px;
+	minimgp->proportiony = py;
+	minimgp->x = imagep->x;
+	minimgp->y = imagep->y;
+	minimgp->imagestart = malloc(sizeof(char) * minimgp->imagesize);
+
+	offset = (offy * minimgp->width + offx) * minimgp->components;
+
+	memset(minimgp->imagestart, 0, minimgp->imagesize);
+
+	for(i = 0; i < minimgp->height; i++){
+		for(j = 0; j < minimgp->width; j++){
+			y = i / py;
+			x = j / px;
+			if(x < imagep->width && y < imagep->height){
+				img_loc = (y * imagep->width + x) * imagep->components;
+				mini_loc = (i * minimgp->width + j) * minimgp->components + offset;
+				for(k = 0; k < 4; k++){
+					minimgp->imagestart[mini_loc + k] = 
+						imagep->imagestart[img_loc + k];
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * initialize image 
+ */
+int fb_image_init(FB_IMAGE *imagep, int width, int height, int components)
+{
+	imagep->x = 0;
+	imagep->y = 0;
+	imagep->width = width;
+	imagep->height = height;
+	imagep->components = components;
+	imagep->imagesize = width * height * components;
+	imagep->imagestart = malloc(imagep->imagesize);
+
+	return 0;
+}
+
+/*
+ * Add image to iamge by line
+ */
+int fb_image_add_image_byline(FB_IMAGE *imagep, FB_IMAGE *retimgp, int line)
+{
+	int j;
+	unsigned long ret_loc;	/* retimgp location */
+	unsigned long im_loc;	/* image location */
+	long cpbytes;
+	unsigned char *p, *q;
+
+	p = retimgp->imagestart;
+	q = imagep->imagestart;
+
+	j = line - 1;
+	
+	/* vertical overflow check */
+	if(0 < imagep->y + j && imagep->y + j < retimgp->height){
+		ret_loc = ((imagep->y + j) * retimgp->width + imagep->x) * retimgp->components;
+		im_loc = j * imagep->width * imagep->components;
+
+		/* horizontal overflow check */
+		if(imagep->x >= 0){
+			if(retimgp->width - imagep->x < imagep->width){
+				cpbytes = retimgp->width - imagep->x;
+			}else{
+				cpbytes = imagep->width;
+			}
+		}else{
+			ret_loc = ret_loc - imagep->x * 4; /* -x > 0 */
+			im_loc = im_loc - imagep->x * 4;
+			cpbytes = imagep->width + imagep->x;
+		}
+		//void *memcpy(void *dest, const void *src, size_t n);
+		if(cpbytes > 0){
+			memcpy(p + ret_loc, q + im_loc, cpbytes * 4); 
+		}
+	}
+
+
+	return 0;
+	
 }
 

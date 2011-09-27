@@ -85,3 +85,23 @@ int fb_close(FB *fbp)
 
 	return 0;
 }
+
+/*
+ * clear framebuffer memory
+ */
+int fb_clear(FB *fbp)
+{
+	memset(fbp->fb_start, 0, fbp->fb_screensize);
+
+	return 0;
+}
+
+/*
+ * clear framebuffer memory
+ */
+int fb_clear_startpoint(unsigned char *start, unsigned long size)
+{
+	memset(start, 0, size);
+
+	return 0;
+}

@@ -6,6 +6,7 @@
  *		after studying APUE 13 days		*
  ********************************************************/
 
+#include "screen.h"
 #include "pixel.h"
 
 
@@ -45,10 +46,82 @@ int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point)
 	*p++ = (point->color >> 0) & 0xff; /* blue */
 	*p++ = (point->color >> 8) & 0xff; /* green */
 	*p++ = (point->color >> 16) & 0xff; /* red */
-	*p++ = (point->color >> 24) & 0xff; /* transp */
+	*p++ = (point->color >> 24) & 0x0; /* transp */
 
 	return 0;
 }
+
+/*
+ * Draw a pixel (x, y) at screen with color
+ */
+int fb_draw_pixel_screen(FB_SCREEN *screenp, FB_POINT *point)
+{
+	unsigned char *p;	/* point screen (x, y) pixel */
+	unsigned long locate;
+
+	/* over screen resolution */
+	if(point->x < 0 || point->x >= screenp->width){
+		return 1;
+	}
+	if(point->y < 0 || point->y >= screenp->height){
+		return 1;
+	}
+
+	locate = (point->y * screenp->width + point->x) 
+		* screenp->pixelbits / 8;
+	
+	p =  screenp->screenstart + locate;
+
+	*p++ = (point->color >> 0) & 0xff; /* blue */
+	*p++ = (point->color >> 8) & 0xff; /* green */
+	*p++ = (point->color >> 16) & 0xff; /* red */
+	*p++ = (point->color >> 24) & 0x0; /* transp */
+
+	return 0;
+}
+
+/*
+ * Draw a pixel (x, y) at screen with color
+ */
+int fb_draw_pixel_screen_trans(FB_SCREEN *screenp, FB_POINT *point)
+{
+	unsigned char *p;	/* point screen (x, y) pixel */
+	unsigned long locate;
+	unsigned char *q;
+
+	/* over screen resolution */
+	if(point->x < 0 || point->x >= screenp->width){
+		return 1;
+	}
+	if(point->y < 0 || point->y >= screenp->height){
+		return 1;
+	}
+
+	locate = (point->y * screenp->width + point->x) 
+		* (screenp->pixelbits >> 3);
+	
+	p =  screenp->screenstart + locate;
+	q = (unsigned char *)&point->color;
+
+	p[3] = q[3];
+
+	return 0;
+}
+
+int fb_set_pixel_trans(FB_POINT *point, int x, int y, unsigned char trans)
+{
+	unsigned char *p;
+	
+	point->x = x;
+	point->y = y;
+
+	p = (unsigned char *)&point->color;
+
+	p[3] = trans;
+
+	return 0;
+}
+
 
 unsigned long fb_formatRGB(unsigned char red, unsigned char green, unsigned char blue)
 {

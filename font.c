@@ -6,6 +6,7 @@
  *		after studying APUE 33 days		*
  ********************************************************/
 
+#include <stdio.h>
 #include "framebuffer.h"
 #include "pixel.h"
 #include "font.h"
@@ -50,9 +51,9 @@ int fb_font_set_charsize(FB_FONT *ffp, int fontsize)
 	return 0;
 }
 
-int fb_font_draw_bitmap(FB_SCREEN *screenp, FT_Bitmap*  bitmap, FT_Int x, FT_Int y)
+int fb_font_draw_bitmap(FB_SCREEN *screenp, FT_Bitmap *bitmap, FT_Int x, FT_Int y)
 {
-	COLOR_32 color, backcolor;
+	COLOR_32 color[2], backcolor;
 	FB_POINT point;
 
 	FT_Int  i, j, p, q;
@@ -60,24 +61,26 @@ int fb_font_draw_bitmap(FB_SCREEN *screenp, FT_Bitmap*  bitmap, FT_Int x, FT_Int
 	FT_Int  y_max = y + bitmap->rows;
 	unsigned char ch;
 
-	color = fb_formatRGB(255, 255, 255);
+	color[0] = fb_formatRGB(255, 255, 255);
+	color[1] = fb_formatRGB(120, 120, 120);
 	backcolor = fb_formatRGB(0, 0, 0);
 	
 	for ( j = y, q = 0; j < y_max; j++, q++ )
 	{
-
 		for ( i = x, p = 0; i < x_max; i++, p++ ){
 			ch = bitmap->buffer[q * bitmap->width + p];
 			if(ch > 128){
 				//int fb_set_pixel(FB_POINT *point, int x, int y, COLOR_32 color);
-				fb_set_pixel(&point, i, j, color);
+				fb_set_pixel(&point, i, j, color[0]);
 				//int fb_draw_pixel(struct framebuffer *fbp, FB_POINT *point);
-				fb_draw_pixel(screenp, &point);
+				fb_draw_pixel_screen(screenp, &point);
+			}else if(ch > 10){
+				fb_set_pixel(&point, i, j, color[1]);
+				fb_draw_pixel_screen(screenp, &point);
 			}else{
 				fb_set_pixel(&point, i, j, backcolor);
-				fb_draw_pixel(fbp, &point);
+				fb_draw_pixel_screen(screenp, &point);
 			}
-			//	image[j][i] |= bitmap->buffer[q * bitmap->width + p];
 		}
 	}
 	

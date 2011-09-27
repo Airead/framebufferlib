@@ -16,6 +16,9 @@
 
 /*
  * load a jpeg file and fill FB_IMAGE
+ *
+ * return value:
+ *   0 for success, -1 for error
  */
 int fb_load_jpeg(FB_IMAGE *imagep, char *filename)
 {

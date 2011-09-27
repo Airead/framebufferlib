@@ -21,5 +21,7 @@ typedef struct framebuffer{
 
 int fb_open(char *fbname, FB *fbp);
 int fb_close(FB *fbp);
+int fb_clear(FB *fbp);
+int fb_clear_startpoint(unsigned char *start, unsigned long size);
 
 #endif
