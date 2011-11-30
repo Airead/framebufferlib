@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	fb_open("/dev/fb0", &fb);
 
 	//int fb_font_open(char *fontname, FB_FONT *ffp);
-	fb_font_open("Times.ttf", &font);
+	fb_font_open("/usr/share/fonts/truetype/arphic/ukai.ttc", &font);
 
 	fprintf(stdout, "fontsize = %d\n", fontsize);
 

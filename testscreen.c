@@ -14,8 +14,8 @@
 #include "image.h"
 #include "jpeg.h"
 
-#define MOVE 0
-#define LARGE 1
+#define MOVE 1
+#define LARGE 0
 #define ROTA 0
 
 int main(int argc, char *argv[])
@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	FB_SCREEN screen;
 	FB_IMAGE image;
 	FB_IMAGE background;
+	FB_IMAGE retimg;
 
 	//int fb_open(char *fbname, FB *fbp);
 	fb_open("/dev/fb0", &fb);
@@ -99,7 +100,6 @@ int main(int argc, char *argv[])
 #endif
 
 #if LARGE
-	FB_IMAGE retimg;
 	float px, py;
 
 	//int fb_image_setpos(FB_IMAGE *imagep, int x, int y);
